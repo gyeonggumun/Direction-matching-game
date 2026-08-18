@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신호등 방향 매칭 게임</title>
+    <style>
+        /* [카드 1 & 2] 어떤 해상도(1366, 1920)에서도 중앙에 고정되고 잘리지 않는 레이아웃 */
+        :root {
+            --bg-color: #f8fafc;
+            --text-color: #0f172a;
+            --primary-color: #3b82f6;
+            --danger-color: #ef4444;
+            --success-color: #22c55e;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-color);
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            color: var(--text-color);
+            overflow: hidden; /* 가로/세로 넘침 방지 */
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 800px;
+            height: 600px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 상단 옵션바 (카드 5: 접근성 토글) */
+        header {
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            background: #f1f5f9;
+        }
+
+        .stats {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .controls label {
+            margin-left: 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            user-select: none;
+        }
+
+        /* 화면 뷰 컨트롤 */
+        .screen {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            text-align: center;
+        }
+        .screen.active {
+            display: flex;
+        }
+
+        h1 { font-size: 2.5rem; margin-bottom: 8px; color: var(--primary-color); }
+        h2 { font-size: 2rem; margin-bottom: 16px; }
+        p { font-size: 1.1rem; line-height: 1.6; color: #475569; }
+
+        button {
+            padding: 12px 32px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 20px;
+        }
+        button:hover { background-color: #2563eb; }
+
+        /* 게임 플레이 영역 */
+        #timer-bar-container {
+            width: 80%;
+            height: 20px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        #timer-bar {
+            width: 100%;
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.1s linear;
+        }
+
+        #prompt-arrow {
+            font-size: 8rem;
+            line-height: 1;
+            margin: 20px 0;
+            user-select: none;
+        }
+
+        .hud { display: flex; gap: 40px; font-size: 1.2rem; font-weight: bold; }
+        .text-success { color: var(--success-color); }
+        .text-danger { color: var(--danger-color); }
+
+        /* [카드 5] 시각 효과 (애니메이션) */
+        .pulse { animation: pulseAnim 0.3s ease; }
+        @keyframes pulseAnim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); color: var(--success-color); }
+            100% { transform: scale(1); }
+        }
+
+        .shake { animation: shakeAnim 0.3s ease; }
+        @keyframes shakeAnim {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-15px) rotate(-5deg); color: var(--danger-color); }
+            75% { transform: translateX(15px) rotate(5deg); }
+        }
+
+        /* 움직임 줄이기 체크 시 애니메이션 비활성화 */
+        body.reduced-motion .pulse,
+        body.reduced-motion .shake {
+            animation: none !important;
+            transform: none !important;
+        }
+
+        /* 일시정지 오버레이 */
+        #pause-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- 공통 상단 영역 -->
+        <header>
+            <div class="stats">
+                최고 점수: <span id="ui-best-score">0</span>
+            </div>
+            <div class="controls">
+                <label><input type="checkbox" id="mute-toggle"> 🔇 음소거</label>
+                <label><input type="checkbox" id="motion-toggle"> 🔕 움직임 줄이기</label>
+            </div>
+        </header>
+
+        <!-- 1. 시작 화면 -->
+        <div id="screen-start" class="screen active">
+            <h1>방향 매칭 게임</h1>
+            <p>화면에 나타나는 화살표 방향과 똑같은 <b>키보드 방향키(↑, ↓, ←, →)</b>를 누르세요.<br>
+            제한 시간 30초 내에 목표 점수에 도달하면 성공, 3번 틀리면 실패합니다.</p>
+            <button id="btn-start">게임 시작</button>
+        </div>
+
+        <!-- 2. 게임 진행 화면 -->
+        <div id="screen-playing" class="screen">
+            <div id="timer-bar-container">
+                <div id="timer-bar"></div>
+            </div>
+            <div id="prompt-arrow">⬆️</div>
+            <div class="hud">
+                <div class="text-success">현재 점수: <span id="ui-score">0</span> / 20</div>
+                <div class="text-danger">실수: <span id="ui-mistakes">0</span> / 3</div>
+            </div>
+        </div>
+
+        <!-- 3. 결과 화면 -->
+        <div id="screen-gameover" class="screen">
+            <h1 id="result-title">게임 오버</h1>
+            <p id="result-desc"></p>
+            <button id="btn-restart">다시 시작 (초기화)</button>
+        </div>
+
+        <!-- 일시정지 화면 -->
+        <div id="pause-overlay">
+            <h2>일시 정지됨</h2>
+            <p>화면을 클릭하면 다시 시작합니다.</p>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * [카드 3] 난이도 조정 상수
+         * 과제 제출 시 이 값을 변경해가며 플레이 데이터를 비교하세요.
+         */
+        const DIFFICULTY_TIME_LIMIT = 30.0; // 전체 제한 시간 (초)
+        const GOAL_SCORE = 20; // 성공을 위한 목표 점수
+        const MAX_MISTAKES = 3; // 실패 조건 (실수 횟수)
+
+        // 방향키 맵핑
+        const ARROWS = {
+            'ArrowUp': '⬆️',
+            'ArrowDown': '⬇️',
+            'ArrowLeft': '⬅️',
+            'ArrowRight': '➡️'
+        };
+        const ARROW_KEYS = Object.keys(ARROWS);
+
+        // 상태 관리 (카드 1: 현재 판 초기화)
+        let state = {
+            status: 'IDLE', // IDLE, PLAYING, PAUSED, OVER
+            score: 0,
+            mistakes: 0,
+            timeLeft: DIFFICULTY_TIME_LIMIT,
+            currentKey: '',
+            lastFrameTime: 0
+        };
+
+        // DOM 요소 캐싱
+        const screens = {
+            start: document.getElementById('screen-start'),
+            playing: document.getElementById('screen-playing'),
+            gameover: document.getElementById('screen-gameover')
+        };
+        const els = {
+            promptArrow: document.getElementById('prompt-arrow'),
+            score: document.getElementById('ui-score'),
+            mistakes: document.getElementById('ui-mistakes'),
+            bestScore: document.getElementById('ui-best-score'),
+            timerBar: document.getElementById('timer-bar'),
+            resultTitle: document.getElementById('result-title'),
+            resultDesc: document.getElementById('result-desc'),
+            pauseOverlay: document.getElementById('pause-overlay'),
+            muteToggle: document.getElementById('mute-toggle'),
+            motionToggle: document.getElementById('motion-toggle')
+        };
+
+        // [카드 4] 저장과 복구 (로컬 스토리지)
+        function loadBestScore() {
+            try {
+                // 저장값이 없거나 깨졌을 때 기본값 0을 반환하도록 예외 처리
+                const saved = localStorage.getItem('dirMatchBestScore');
+                const parsed = parseInt(saved, 10);
+                return isNaN(parsed) ? 0 : parsed;
+            } catch (e) {
+                return 0; // 프라이빗 모드 등 스토리지 접근 불가 시 안전한 폴백
+            }
+        }
+
+        function saveBestScore(score) {
+            try {
+                const currentBest = loadBestScore();
+                if (score > currentBest) {
+                    localStorage.setItem('dirMatchBestScore', score);
+                    els.bestScore.innerText = score;
+                }
+            } catch (e) {}
+        }
+
+        // 초기화
+        function init() {
+            els.bestScore.innerText = loadBestScore();
+            
+            document.getElementById('btn-start').addEventListener('click', startGame);
+            document.getElementById('btn-restart').addEventListener('click', startGame);
+            els.pauseOverlay.addEventListener('click', resumeGame);
+
+            // [카드 5] 움직임 줄이기 (CSS 클래스 토글)
+            els.motionToggle.addEventListener('change', (e) => {
+                document.body.classList.toggle('reduced-motion', e.target.checked);
+            });
+
+            // [카드 2] 연속 입력 검사 및 핵심 로직
+            window.addEventListener('keydown', handleInput);
+
+            // [카드 2] 포커스 이탈 시 일시정지
+            window.addEventListener('blur', () => {
+                if (state.status === 'PLAYING') pauseGame();
+            });
+        }
+
+        // 새 게임 시작
+        function startGame() {
+            // 현재 판 상태 초기화
+            state.status = 'PLAYING';
+            state.score = 0;
+            state.mistakes = 0;
+            state.timeLeft = DIFFICULTY_TIME_LIMIT;
+            state.lastFrameTime = performance.now();
+
+            updateHUD();
+            setNextArrow();
+            switchScreen('playing');
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 틱(시간) 업데이트 루프
+        function gameLoop(currentTime) {
+            if (state.status !== 'PLAYING') return;
+
+            const deltaTime = (currentTime - state.lastFrameTime) / 1000; // 초 단위
+            state.lastFrameTime = currentTime;
+            state.timeLeft -= deltaTime;
+
+            // 타이머 UI 업데이트
+            const percentage = Math.max(0, (state.timeLeft / DIFFICULTY_TIME_LIMIT) * 100);
+            els.timerBar.style.width = `${percentage}%`;
+            
+            // 색상 경고 효과 (시간이 30% 이하일 때)
+            if (percentage < 30) els.timerBar.style.background = 'var(--danger-color)';
+            else els.timerBar.style.background = 'var(--primary-color)';
+
+            // 시간 초과 시 실패 처리
+            if (state.timeLeft <= 0) {
+                endGame(false, "시간이 다 되었습니다.");
+                return;
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function setNextArrow() {
+            // 같은 방향이 연속으로 나올 수도 있도록 완전 무작위
+            const randomIndex = Math.floor(Math.random() * ARROW_KEYS.length);
+            state.currentKey = ARROW_KEYS[randomIndex];
+            els.promptArrow.innerText = ARROWS[state.currentKey];
+            
+            // 애니메이션 리셋을 위한 트릭
+            els.promptArrow.classList.remove('pulse', 'shake');
+            void els.promptArrow.offsetWidth; 
+        }
+
+        // 입력 처리
+        function handleInput(e) {
+            // 게임 중이 아니거나 방향키가 아닌 입력은 무시
+            if (state.status !== 'PLAYING') return;
+            if (!ARROW_KEYS.includes(e.key)) return;
+
+            e.preventDefault(); // 방향키로 화면이 스크롤되는 현상 방지
+
+            if (e.key === state.currentKey) {
+                handleSuccess();
+            } else {
+                handleMistake();
+            }
+        }
+
+        function handleSuccess() {
+            playSound('success');
+            triggerAnimation('pulse');
+            
+            state.score++;
+            updateHUD();
+
+            if (state.score >= GOAL_SCORE) {
+                endGame(true, "목표 점수에 도달했습니다! 축하합니다.");
+            } else {
+                setNextArrow();
+            }
+        }
+
+        function handleMistake() {
+            playSound('error');
+            triggerAnimation('shake');
+
+            state.mistakes++;
+            updateHUD();
+
+            if (state.mistakes >= MAX_MISTAKES) {
+                endGame(false, `3번 실수하여 실패했습니다.`);
+            } else {
+                setNextArrow(); // 틀려도 다음 문제로 넘어감
+            }
+        }
+
+        // 시각 효과 트리거
+        function triggerAnimation(animClass) {
+            els.promptArrow.classList.add(animClass);
+            setTimeout(() => {
+                els.promptArrow.classList.remove(animClass);
+            }, 300);
+        }
+
+        // [카드 5] 간단한 비프음 생성 (외부 파일 로딩 에러 방지용)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (els.muteToggle.checked) return; // 음소거 체크 시 사운드 무시
+            
+            // 유저 상호작용 후 AudioContext 재개 (브라우저 정책)
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            if (type === 'success') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'error') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            }
+        }
+
+        function updateHUD() {
+            els.score.innerText = state.score;
+            els.mistakes.innerText = state.mistakes;
+        }
+
+        function pauseGame() {
+            state.status = 'PAUSED';
+            els.pauseOverlay.style.display = 'flex';
+        }
+
+        function resumeGame() {
+            state.status = 'PLAYING';
+            els.pauseOverlay.style.display = 'none';
+            state.lastFrameTime = performance.now();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function endGame(isSuccess, message) {
+            state.status = 'OVER';
+            saveBestScore(state.score); // 보존할 기록 저장
+
+            els.resultTitle.innerText = isSuccess ? '🎯 성공!' : '💀 실패!';
+            els.resultTitle.className = isSuccess ? 'text-success' : 'text-danger';
+            
+            const timeTaken = (DIFFICULTY_TIME_LIMIT - state.timeLeft).toFixed(1);
+            els.resultDesc.innerHTML = `${message}<br><br>
+                최종 점수: <b>${state.score}</b>점<br>
+                걸린 시간: <b>${timeTaken}</b>초`;
+
+            switchScreen('gameover');
+        }
+
+        function switchScreen(screenName) {
+            Object.values(screens).forEach(s => s.classList.remove('active'));
+            screens[screenName].classList.add('active');
+        }
+
+        // 앱 초기화 실행
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
