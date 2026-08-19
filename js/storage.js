@@ -18,26 +18,33 @@ export function saveBestScore(score, updateUI) {
     } catch (e) {}
 }
 
-export function loadRankings() {
+// 자동 기록 저장용 로직
+export function loadRecords() {
     try {
-        const data = localStorage.getItem('dirMatchRankings');
+        const data = localStorage.getItem('dirMatchAutoRecords');
         return data ? JSON.parse(data) : [];
     } catch (e) {
         return [];
     }
 }
 
-export function saveRanking(name, score) {
+export function saveRecord(score, timeTaken, isSuccess) {
     try {
-        const rankings = loadRankings();
-        rankings.push({ name: name, score: score, date: new Date().getTime() });
+        const records = loadRecords();
         
-        rankings.sort((a, b) => b.score - a.score || b.date - a.date);
+        // 새 기록을 맨 앞에 추가 (최신순)
+        records.unshift({ 
+            score: score, 
+            timeTaken: timeTaken, 
+            isSuccess: isSuccess,
+            date: new Date().toLocaleTimeString() // 시간 기록
+        });
         
-        const top10 = rankings.slice(0, 10);
-        localStorage.setItem('dirMatchRankings', JSON.stringify(top10));
+        // 최대 20개까지만 자르기
+        const top20 = records.slice(0, 20);
+        localStorage.setItem('dirMatchAutoRecords', JSON.stringify(top20));
         
-        return top10;
+        return top20;
     } catch (e) {
         return [];
     }

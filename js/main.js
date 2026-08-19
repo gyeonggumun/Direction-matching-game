@@ -1,8 +1,7 @@
-// js/main.js
 import { DIFFICULTY_TIME_LIMIT, GOAL_SCORE, MAX_MISTAKES, ARROWS, ARROW_KEYS } from './config.js';
-import { loadBestScore, saveBestScore } from './storage.js';
+import { loadBestScore, saveBestScore, loadRecords, saveRecord } from './storage.js';
 import { playSound } from './audio.js';
-import { els, triggerAnimation, updateHUD, switchScreen } from './ui.js';
+import { els, triggerAnimation, updateHUD, switchScreen, renderRecords } from './ui.js';
 
 let state = {
     status: 'IDLE',
@@ -21,6 +20,18 @@ function init() {
     els.btnStart.addEventListener('click', startGame);
     els.btnRestart.addEventListener('click', startGame);
     els.pauseOverlay.addEventListener('click', resumeGame);
+    
+    // 기록 보기 버튼 클릭 시 렌더링 및 화면 전환
+    els.btnViewRecords.addEventListener('click', () => {
+        const records = loadRecords();
+        renderRecords(records);
+        switchScreen('ranking');
+    });
+
+    els.btnBackToStart.addEventListener('click', () => {
+        els.bestScore.innerText = loadBestScore();
+        switchScreen('start');
+    });
 
     els.motionToggle.addEventListener('change', (e) => {
         document.body.classList.toggle('reduced-motion', e.target.checked);
@@ -132,14 +143,20 @@ function resumeGame() {
 
 function endGame(isSuccess, message) {
     state.status = 'OVER';
+    
+    // 최고 점수 갱신
     saveBestScore(state.score, (newBest) => {
         els.bestScore.innerText = newBest;
     }); 
 
+    const timeTaken = (DIFFICULTY_TIME_LIMIT - state.timeLeft).toFixed(1);
+    
+    // 💡 게임 종료 즉시 최근 플레이 20회 기록에 자동 추가
+    saveRecord(state.score, timeTaken, isSuccess);
+
     els.resultTitle.innerText = isSuccess ? '🎯 성공!' : '💀 실패!';
     els.resultTitle.className = isSuccess ? 'text-success' : 'text-danger';
     
-    const timeTaken = (DIFFICULTY_TIME_LIMIT - state.timeLeft).toFixed(1);
     els.resultDesc.innerHTML = `${message}<br><br>
         최종 점수: <b>${state.score}</b>점<br>
         걸린 시간: <b>${timeTaken}</b>초`;

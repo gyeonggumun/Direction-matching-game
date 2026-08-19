@@ -18,11 +18,9 @@ export const els = {
     motionToggle: document.getElementById('motion-toggle'),
     btnStart: document.getElementById('btn-start'),
     btnRestart: document.getElementById('btn-restart'),
-    inputName: document.getElementById('input-name'),
-    btnSubmitScore: document.getElementById('btn-submit-score'),
+    btnViewRecords: document.getElementById('btn-view-records'),
     rankingList: document.getElementById('ranking-list'),
-    btnBackToStart: document.getElementById('btn-back-to-start'),
-    rankingForm: document.getElementById('ranking-form')
+    btnBackToStart: document.getElementById('btn-back-to-start')
 };
 
 export function triggerAnimation(animClass) {
@@ -42,22 +40,24 @@ export function switchScreen(screenName) {
     screens[screenName].classList.add('active');
 }
 
-export function renderLeaderboard(rankings) {
+export function renderRecords(records) {
     els.rankingList.innerHTML = '';
     
-    if (rankings.length === 0) {
-        els.rankingList.innerHTML = '<li class="ranking-item">등록된 랭킹이 없습니다.</li>';
+    if (records.length === 0) {
+        els.rankingList.innerHTML = '<li class="ranking-item">아직 플레이 기록이 없습니다.</li>';
         return;
     }
 
-    rankings.forEach((rank, index) => {
+    records.forEach((rec, index) => {
         const li = document.createElement('li');
         li.className = 'ranking-item';
-        if (index < 3) li.classList.add('top-rank');
+        
+        const statusText = rec.isSuccess ? '🟢 성공' : '🔴 실패';
         
         li.innerHTML = `
-            <span>${index + 1}위 - ${rank.name}</span>
-            <span>${rank.score}점</span>
+            <span style="color: #64748b; font-size: 0.9em; width: 30px;">${index + 1}</span>
+            <span style="flex: 1;"><b>${rec.score}점</b> (${rec.timeTaken}초)</span>
+            <span style="font-weight: bold;">${statusText}</span>
         `;
         els.rankingList.appendChild(li);
     });
