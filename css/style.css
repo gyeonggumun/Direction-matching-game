@@ -184,3 +184,44 @@ body.reduced-motion .shake {
     font-weight: bold;
     color: #d97706;
 }
+
+/* ✨ 임팩트 효과: 배경 플래시 */
+.flash-success {
+    animation: flashSuccessAnim 0.3s ease-out;
+}
+@keyframes flashSuccessAnim {
+    0% { background-color: rgba(34, 197, 94, 0.4); }
+    100% { background-color: white; }
+}
+
+.flash-danger {
+    animation: flashDangerAnim 0.3s ease-out;
+}
+@keyframes flashDangerAnim {
+    0% { background-color: rgba(239, 68, 68, 0.4); }
+    100% { background-color: white; }
+}
+
+/* ✨ 임팩트 효과: 떠오르는 텍스트 (플로팅 데미지 텍스트 느낌) */
+.floating-text {
+    position: absolute;
+    font-size: 2.5rem;
+    font-weight: 900;
+    pointer-events: none; /* 클릭 방해 금지 */
+    text-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    animation: floatUp 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    z-index: 50;
+}
+@keyframes floatUp {
+    0% { opacity: 1; transform: translate(-50%, 0) scale(0.8); }
+    50% { transform: translate(-50%, -40px) scale(1.2); }
+    100% { opacity: 0; transform: translate(-50%, -60px) scale(1); }
+}
+
+/* [카드 5] 움직임 줄이기 체크 시 새로운 이펙트도 차단 */
+body.reduced-motion .flash-success,
+body.reduced-motion .flash-danger,
+body.reduced-motion .floating-text {
+    animation: none !important;
+    display: none !important; 
+}

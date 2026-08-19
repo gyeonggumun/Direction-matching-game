@@ -1,8 +1,7 @@
 import { DIFFICULTY_TIME_LIMIT, GOAL_SCORE, MAX_MISTAKES, ARROWS, ARROW_KEYS } from './config.js';
 import { loadBestScore, saveBestScore, loadRecords, saveRecord } from './storage.js';
 import { playSound } from './audio.js';
-import { els, triggerAnimation, updateHUD, switchScreen, renderRecords } from './ui.js';
-
+import { els, triggerAnimation, updateHUD, switchScreen, renderRecords, triggerImpact } from './ui.js'; // triggerImpact 추가
 let state = {
     status: 'IDLE',
     score: 0,
@@ -103,8 +102,9 @@ function handleInput(e) {
 
 function handleSuccess() {
     playSound('success', els.muteToggle.checked);
-    triggerAnimation('pulse');
-    
+    triggerAnimation('pulse');  // 기존 화살표 이펙트
+    triggerImpact('success');   // ✨ 추가된 전체 임팩트
+
     state.score++;
     updateHUD(state.score, state.mistakes);
 
@@ -117,7 +117,8 @@ function handleSuccess() {
 
 function handleMistake() {
     playSound('error', els.muteToggle.checked);
-    triggerAnimation('shake');
+    triggerAnimation('shake'); // 기존 화살표 이펙트
+    triggerImpact('error');    // ✨ 추가된 전체 임팩트
 
     state.mistakes++;
     updateHUD(state.score, state.mistakes);
