@@ -15,6 +15,10 @@ let state = {
 
 let animationFrameId;
 
+// 💡 추가됨: 일시정지 타이머 관리를 위한 변수
+let pauseIntervalId;
+let pauseStartTime;
+
 function init() {
     els.bestScore.innerText = loadBestScore();
     
@@ -55,7 +59,6 @@ function init() {
 
     window.addEventListener('keydown', handleInput);
     
-    // 브라우저 밖을 클릭했을 때도 일시정지 (포커스 이탈)
     window.addEventListener('blur', () => {
         if (state.status === 'PLAYING') pauseGame();
     });
@@ -119,21 +122,19 @@ function setNextArrow() {
 }
 
 function handleInput(e) {
-    // 💡 ESC 키 입력 처리 (일시정지 / 재개 토글)
     if (e.key === 'Escape') {
         if (state.status === 'PLAYING') {
             pauseGame();
         } else if (state.status === 'PAUSED') {
             resumeGame();
         }
-        return; // ESC 처리가 끝나면 로직 종료
+        return; 
     }
 
-    // 플레이 상태가 아니거나 방향키가 아니면 무시
     if (state.status !== 'PLAYING') return;
     if (!ARROW_KEYS.includes(e.key)) return;
 
-    e.preventDefault(); // 스크롤 등 기본 동작 방지
+    e.preventDefault(); 
 
     if (e.key === state.currentKey) {
         handleSuccess();
@@ -174,12 +175,28 @@ function handleMistake() {
 
 function pauseGame() {
     state.status = 'PAUSED';
+    
+    // 💡 변경됨: 일시정지 지속 시간 타이머 로직
+    pauseStartTime = Date.now();
+    els.pauseTime.innerText = `⏱ 정지된 시간: 00:00`;
     els.pauseOverlay.style.display = 'flex';
+    
+    pauseIntervalId = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - pauseStartTime) / 1000);
+        const minutes = String(Math.floor(elapsed / 60)).padStart(2, '0');
+        const seconds = String(elapsed % 60).padStart(2, '0');
+        
+        els.pauseTime.innerText = `⏱ 정지된 시간: ${minutes}:${seconds}`;
+    }, 1000); // 1초마다 업데이트
 }
 
 function resumeGame() {
     state.status = 'PLAYING';
     els.pauseOverlay.style.display = 'none';
+    
+    // 💡 변경됨: 게임 재개 시 타이머 멈춤
+    clearInterval(pauseIntervalId); 
+    
     state.lastFrameTime = performance.now();
     animationFrameId = requestAnimationFrame(gameLoop);
 }

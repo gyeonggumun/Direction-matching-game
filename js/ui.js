@@ -23,11 +23,14 @@ export const els = {
     btnStartHard: document.getElementById('btn-start-hard'),
     
     btnRestart: document.getElementById('btn-restart'),
-    btnBackToDiff: document.getElementById('btn-back-to-diff'), // 💡 새로 추가된 버튼
+    btnBackToDiff: document.getElementById('btn-back-to-diff'),
     btnViewRecords: document.getElementById('btn-view-records'),
     rankingList: document.getElementById('ranking-list'),
     btnBackToStart: document.getElementById('btn-back-to-start'),
-    btnClearRecords: document.getElementById('btn-clear-records') 
+    btnClearRecords: document.getElementById('btn-clear-records'),
+    
+    // 💡 추가됨: 일시정지 시간 텍스트 요소
+    pauseTime: document.getElementById('ui-pause-time')
 };
 
 export function triggerAnimation(animClass) {
