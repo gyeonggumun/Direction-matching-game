@@ -21,7 +21,8 @@ export const els = {
     btnRestart: document.getElementById('btn-restart'),
     btnViewRecords: document.getElementById('btn-view-records'),
     rankingList: document.getElementById('ranking-list'),
-    btnBackToStart: document.getElementById('btn-back-to-start')
+    btnBackToStart: document.getElementById('btn-back-to-start'),
+    btnClearRecords: document.getElementById('btn-clear-records') // 추가된 버튼
 };
 
 export function triggerAnimation(animClass) {
@@ -64,24 +65,19 @@ export function renderRecords(records) {
     });
 }
 
-// 2. 파일 맨 아래에 새로운 임팩트 함수 추가
 export function triggerImpact(type) {
-    // 움직임 줄이기가 켜져 있으면 DOM 생성 자체를 스킵하여 최적화
     if (document.body.classList.contains('reduced-motion')) return;
 
-    // 배경 번쩍임 효과
     const flashClass = type === 'success' ? 'flash-success' : 'flash-danger';
     els.gameContainer.classList.add(flashClass);
     setTimeout(() => els.gameContainer.classList.remove(flashClass), 300);
 
-    // 떠오르는 텍스트 생성
     const floatEl = document.createElement('div');
     floatEl.className = 'floating-text';
     
-    // 약간의 무작위성을 주어 텍스트가 겹치지 않고 역동적으로 보이게 처리
     const randomOffset = Math.random() * 20 - 10; 
     floatEl.style.left = `calc(50% + ${randomOffset}px)`;
-    floatEl.style.top = '35%'; // 화살표 살짝 위쪽
+    floatEl.style.top = '35%';
 
     if (type === 'success') {
         floatEl.innerText = 'PERFECT!';
@@ -93,7 +89,6 @@ export function triggerImpact(type) {
 
     els.gameContainer.appendChild(floatEl);
 
-    // CSS 애니메이션 시간(0.6초)이 끝나면 DOM 트리에서 제거하여 메모리 관리
     setTimeout(() => {
         floatEl.remove();
     }, 600);

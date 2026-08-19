@@ -1,7 +1,8 @@
 import { DIFFICULTY_TIME_LIMIT, GOAL_SCORE, MAX_MISTAKES, ARROWS, ARROW_KEYS } from './config.js';
-import { loadBestScore, saveBestScore, loadRecords, saveRecord } from './storage.js';
+import { loadBestScore, saveBestScore, loadRecords, saveRecord, clearRecords } from './storage.js';
 import { playSound } from './audio.js';
-import { els, triggerAnimation, updateHUD, switchScreen, renderRecords, triggerImpact } from './ui.js'; // triggerImpact 추가
+import { els, triggerAnimation, updateHUD, switchScreen, renderRecords, triggerImpact } from './ui.js';
+
 let state = {
     status: 'IDLE',
     score: 0,
@@ -20,7 +21,6 @@ function init() {
     els.btnRestart.addEventListener('click', startGame);
     els.pauseOverlay.addEventListener('click', resumeGame);
     
-    // 기록 보기 버튼 클릭 시 렌더링 및 화면 전환
     els.btnViewRecords.addEventListener('click', () => {
         const records = loadRecords();
         renderRecords(records);
@@ -30,6 +30,14 @@ function init() {
     els.btnBackToStart.addEventListener('click', () => {
         els.bestScore.innerText = loadBestScore();
         switchScreen('start');
+    });
+
+    // 기록 초기화 기능
+    els.btnClearRecords.addEventListener('click', () => {
+        if (confirm("정말로 모든 기록을 삭제하시겠습니까?")) {
+            const emptyRecords = clearRecords();
+            renderRecords(emptyRecords);
+        }
     });
 
     els.motionToggle.addEventListener('change', (e) => {
@@ -102,8 +110,8 @@ function handleInput(e) {
 
 function handleSuccess() {
     playSound('success', els.muteToggle.checked);
-    triggerAnimation('pulse');  // 기존 화살표 이펙트
-    triggerImpact('success');   // ✨ 추가된 전체 임팩트
+    triggerAnimation('pulse');  
+    triggerImpact('success');   
 
     state.score++;
     updateHUD(state.score, state.mistakes);
@@ -117,8 +125,8 @@ function handleSuccess() {
 
 function handleMistake() {
     playSound('error', els.muteToggle.checked);
-    triggerAnimation('shake'); // 기존 화살표 이펙트
-    triggerImpact('error');    // ✨ 추가된 전체 임팩트
+    triggerAnimation('shake'); 
+    triggerImpact('error');    
 
     state.mistakes++;
     updateHUD(state.score, state.mistakes);
@@ -145,14 +153,12 @@ function resumeGame() {
 function endGame(isSuccess, message) {
     state.status = 'OVER';
     
-    // 최고 점수 갱신
     saveBestScore(state.score, (newBest) => {
         els.bestScore.innerText = newBest;
     }); 
 
     const timeTaken = (DIFFICULTY_TIME_LIMIT - state.timeLeft).toFixed(1);
     
-    // 💡 게임 종료 즉시 최근 플레이 20회 기록에 자동 추가
     saveRecord(state.score, timeTaken, isSuccess);
 
     els.resultTitle.innerText = isSuccess ? '🎯 성공!' : '💀 실패!';
