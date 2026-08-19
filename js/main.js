@@ -24,7 +24,6 @@ function init() {
     
     els.btnRestart.addEventListener('click', () => startGame(state.currentDifficulty.id));
     
-    // 💡 새로 추가된 버튼: 클릭 시 난이도 선택(시작) 화면으로 이동
     els.btnBackToDiff.addEventListener('click', () => {
         els.bestScore.innerText = loadBestScore();
         switchScreen('start');
@@ -55,6 +54,8 @@ function init() {
     });
 
     window.addEventListener('keydown', handleInput);
+    
+    // 브라우저 밖을 클릭했을 때도 일시정지 (포커스 이탈)
     window.addEventListener('blur', () => {
         if (state.status === 'PLAYING') pauseGame();
     });
@@ -118,10 +119,21 @@ function setNextArrow() {
 }
 
 function handleInput(e) {
+    // 💡 ESC 키 입력 처리 (일시정지 / 재개 토글)
+    if (e.key === 'Escape') {
+        if (state.status === 'PLAYING') {
+            pauseGame();
+        } else if (state.status === 'PAUSED') {
+            resumeGame();
+        }
+        return; // ESC 처리가 끝나면 로직 종료
+    }
+
+    // 플레이 상태가 아니거나 방향키가 아니면 무시
     if (state.status !== 'PLAYING') return;
     if (!ARROW_KEYS.includes(e.key)) return;
 
-    e.preventDefault();
+    e.preventDefault(); // 스크롤 등 기본 동작 방지
 
     if (e.key === state.currentKey) {
         handleSuccess();

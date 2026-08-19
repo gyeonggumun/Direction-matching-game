@@ -44,14 +44,12 @@
             </div>
         </div>
 
-        <!-- 3. 결과 화면 (버튼 줄바꿈 현상 수정) -->
+        <!-- 3. 결과 화면 -->
         <div id="screen-gameover" class="screen">
             <h1 id="result-title">게임 오버</h1>
             <p id="result-desc"></p>
             
-            <!-- width를 max-content로 변경하여 글자 길이에 맞춰 늘어나도록 수정 -->
             <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px; width: max-content; min-width: 280px;">
-                <!-- white-space: nowrap을 추가하여 강제 줄바꿈 방지 -->
                 <button id="btn-view-records" style="background-color: #10b981; margin: 0; white-space: nowrap;">📊 내 20회 기록 보기</button>
                 <button id="btn-restart" style="background-color: #64748b; margin: 0; white-space: nowrap;">다시 시작 (방금 난이도)</button>
                 <button id="btn-back-to-diff" style="background-color: #3b82f6; margin: 0; white-space: nowrap;">🏠 난이도 선택으로 가기</button>
@@ -73,10 +71,10 @@
             </div>
         </div>
 
-        <!-- 일시정지 화면 -->
+        <!-- 💡 일시정지 화면 (안내 문구 수정됨) -->
         <div id="pause-overlay">
             <h2>일시 정지됨</h2>
-            <p>화면을 클릭하면 다시 시작합니다.</p>
+            <p>화면을 클릭하거나 ESC를 누르면 다시 시작합니다.</p>
         </div>
     </div>
 
