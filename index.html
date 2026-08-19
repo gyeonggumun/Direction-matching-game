@@ -44,15 +44,17 @@
             </div>
         </div>
 
-        <!-- 3. 결과 화면 (수정됨: 홈으로 가기 버튼 추가) -->
+        <!-- 3. 결과 화면 (버튼 줄바꿈 현상 수정) -->
         <div id="screen-gameover" class="screen">
             <h1 id="result-title">게임 오버</h1>
             <p id="result-desc"></p>
             
-            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px; width: 250px;">
-                <button id="btn-view-records" style="background-color: #10b981; margin: 0;">📊 내 20회 기록 보기</button>
-                <button id="btn-restart" style="background-color: #64748b; margin: 0;">다시 시작 (방금 난이도)</button>
-                <button id="btn-back-to-diff" style="background-color: #3b82f6; margin: 0;">🏠 난이도 선택으로 가기</button>
+            <!-- width를 max-content로 변경하여 글자 길이에 맞춰 늘어나도록 수정 -->
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px; width: max-content; min-width: 280px;">
+                <!-- white-space: nowrap을 추가하여 강제 줄바꿈 방지 -->
+                <button id="btn-view-records" style="background-color: #10b981; margin: 0; white-space: nowrap;">📊 내 20회 기록 보기</button>
+                <button id="btn-restart" style="background-color: #64748b; margin: 0; white-space: nowrap;">다시 시작 (방금 난이도)</button>
+                <button id="btn-back-to-diff" style="background-color: #3b82f6; margin: 0; white-space: nowrap;">🏠 난이도 선택으로 가기</button>
             </div>
         </div>
 
