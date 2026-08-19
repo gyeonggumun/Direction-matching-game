@@ -19,12 +19,17 @@
             </div>
         </header>
 
-        <!-- 1. 시작 화면 -->
+        <!-- 1. 시작 화면 (수정됨: 난이도 버튼 3개 추가) -->
         <div id="screen-start" class="screen active">
             <h1>방향 매칭 게임</h1>
             <p>화면에 나타나는 화살표 방향과 똑같은 <b>키보드 방향키(↑, ↓, ←, →)</b>를 누르세요.<br>
-            제한 시간 30초 내에 목표 점수에 도달하면 성공, 3번 틀리면 실패합니다.</p>
-            <button id="btn-start">게임 시작</button>
+            목표 점수 20점에 도달하면 성공, 3번 틀리면 실패합니다.</p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: center;">
+                <button id="btn-start-easy" style="background-color: #22c55e;">쉬움 (30초)</button>
+                <button id="btn-start-normal" style="background-color: #f59e0b;">보통 (20초)</button>
+                <button id="btn-start-hard" style="background-color: #ef4444;">어려움 (10초)</button>
+            </div>
         </div>
 
         <!-- 2. 게임 진행 화면 -->
@@ -32,7 +37,7 @@
             <div id="timer-bar-container">
                 <div id="timer-bar"></div>
             </div>
-            <div id="prompt-arrow">⬆️</div>
+            <div id="prompt-arrow">▲</div>
             <div class="hud">
                 <div class="text-success">현재 점수: <span id="ui-score">0</span> / 20</div>
                 <div class="text-danger">실수: <span id="ui-mistakes">0</span> / 3</div>
@@ -45,10 +50,10 @@
             <p id="result-desc"></p>
             
             <button id="btn-view-records" style="background-color: #10b981; margin-top: 20px;">📊 내 20회 기록 보기</button>
-            <button id="btn-restart" style="background-color: #64748b; margin-top: 10px;">다시 시작</button>
+            <button id="btn-restart" style="background-color: #64748b; margin-top: 10px;">다시 시작 (방금 난이도)</button>
         </div>
 
-        <!-- 4. 기록 화면 (레이아웃 수정 및 초기화 버튼 추가) -->
+        <!-- 4. 기록 화면 -->
         <div id="screen-ranking" class="screen">
             <h1 style="margin-bottom: 5px;">📊 최근 플레이 기록</h1>
             <p style="font-size: 0.9rem; margin-top: 0; margin-bottom: 15px;">최대 20회까지 자동으로 보존됩니다.</p>
@@ -57,7 +62,6 @@
                 <!-- 자바스크립트로 리스트 렌더링 -->
             </ul>
             
-            <!-- 버튼들을 가로로 나란히 배치 -->
             <div style="display: flex; gap: 15px; margin-top: auto;">
                 <button id="btn-clear-records" style="background-color: #ef4444;">기록 초기화</button>
                 <button id="btn-back-to-start" style="background-color: #3b82f6;">처음으로 돌아가기</button>

@@ -27,7 +27,8 @@ export function loadRecords() {
     }
 }
 
-export function saveRecord(score, timeTaken, isSuccess) {
+// 매개변수에 difficultyName 추가
+export function saveRecord(score, timeTaken, isSuccess, difficultyName) {
     try {
         const records = loadRecords();
         
@@ -35,6 +36,7 @@ export function saveRecord(score, timeTaken, isSuccess) {
             score: score, 
             timeTaken: timeTaken, 
             isSuccess: isSuccess,
+            difficultyName: difficultyName, // 난이도 저장
             date: new Date().toLocaleTimeString()
         });
         

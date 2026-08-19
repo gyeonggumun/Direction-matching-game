@@ -80,9 +80,8 @@ button {
     border-radius: 8px;
     cursor: pointer;
     transition: background 0.2s;
-    margin-top: 20px;
 }
-button:hover { background-color: #2563eb; }
+button:hover { filter: brightness(0.9); }
 
 #timer-bar-container {
     width: 80%;
@@ -100,11 +99,18 @@ button:hover { background-color: #2563eb; }
 }
 
 #prompt-arrow {
-    font-size: 8rem;
+    font-size: 10rem; /* 텍스트 기호이므로 크기를 약간 더 키움 */
     line-height: 1;
     margin: 20px 0;
     user-select: none;
 }
+
+/* ✨ 화살표 방향별 색상 클래스 추가 */
+.color-up { color: #ef4444; }     /* 빨강 */
+.color-down { color: #3b82f6; }   /* 파랑 */
+.color-left { color: #22c55e; }   /* 초록 */
+.color-right { color: #f59e0b; }  /* 노랑 */
+.color-none { color: var(--text-color); } /* 기본색 */
 
 .hud { display: flex; gap: 40px; font-size: 1.2rem; font-weight: bold; }
 .text-success { color: var(--success-color); }
@@ -113,14 +119,14 @@ button:hover { background-color: #2563eb; }
 .pulse { animation: pulseAnim 0.3s ease; }
 @keyframes pulseAnim {
     0% { transform: scale(1); }
-    50% { transform: scale(1.3); color: var(--success-color); }
+    50% { transform: scale(1.3); }
     100% { transform: scale(1); }
 }
 
 .shake { animation: shakeAnim 0.3s ease; }
 @keyframes shakeAnim {
     0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-15px) rotate(-5deg); color: var(--danger-color); }
+    25% { transform: translateX(-15px) rotate(-5deg); }
     75% { transform: translateX(15px) rotate(5deg); }
 }
 
@@ -140,21 +146,6 @@ body.reduced-motion .shake {
     justify-content: center;
     align-items: center;
     z-index: 100;
-}
-
-/* 랭킹 시스템 스타일 추가 */
-#input-name {
-    padding: 12px;
-    font-size: 1.1rem;
-    border: 2px solid #cbd5e1;
-    border-radius: 8px;
-    width: 200px;
-    text-align: center;
-    outline: none;
-    transition: border-color 0.2s;
-}
-#input-name:focus {
-    border-color: var(--primary-color);
 }
 
 #ranking-list {
@@ -179,35 +170,24 @@ body.reduced-motion .shake {
 .ranking-item:last-child {
     border-bottom: none;
 }
-.ranking-item.top-rank {
-    background: #fffbeb;
-    font-weight: bold;
-    color: #d97706;
-}
 
-/* ✨ 임팩트 효과: 배경 플래시 */
-.flash-success {
-    animation: flashSuccessAnim 0.3s ease-out;
-}
+.flash-success { animation: flashSuccessAnim 0.3s ease-out; }
 @keyframes flashSuccessAnim {
     0% { background-color: rgba(34, 197, 94, 0.4); }
     100% { background-color: white; }
 }
 
-.flash-danger {
-    animation: flashDangerAnim 0.3s ease-out;
-}
+.flash-danger { animation: flashDangerAnim 0.3s ease-out; }
 @keyframes flashDangerAnim {
     0% { background-color: rgba(239, 68, 68, 0.4); }
     100% { background-color: white; }
 }
 
-/* ✨ 임팩트 효과: 떠오르는 텍스트 (플로팅 데미지 텍스트 느낌) */
 .floating-text {
     position: absolute;
     font-size: 2.5rem;
     font-weight: 900;
-    pointer-events: none; /* 클릭 방해 금지 */
+    pointer-events: none; 
     text-shadow: 0 4px 10px rgba(0,0,0,0.2);
     animation: floatUp 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
     z-index: 50;
@@ -218,7 +198,6 @@ body.reduced-motion .shake {
     100% { opacity: 0; transform: translate(-50%, -60px) scale(1); }
 }
 
-/* [카드 5] 움직임 줄이기 체크 시 새로운 이펙트도 차단 */
 body.reduced-motion .flash-success,
 body.reduced-motion .flash-danger,
 body.reduced-motion .floating-text {
