@@ -40,11 +40,27 @@
             </div>
         </div>
 
-        <!-- 3. 결과 화면 -->
+        <!-- 3. 결과 화면 (랭킹 등록 추가) -->
         <div id="screen-gameover" class="screen">
             <h1 id="result-title">게임 오버</h1>
             <p id="result-desc"></p>
-            <button id="btn-restart">다시 시작 (초기화)</button>
+            
+            <!-- 이름 입력 영역 -->
+            <div id="ranking-form" style="margin-top: 20px;">
+                <input type="text" id="input-name" placeholder="당신의 이름을 남겨주세요!" maxlength="10" autocomplete="off">
+                <button id="btn-submit-score">랭킹 등록</button>
+            </div>
+
+            <button id="btn-restart" style="background-color: #64748b; margin-top: 10px;">다시 시작 (초기화)</button>
+        </div>
+
+        <!-- 4. 랭킹 화면 -->
+        <div id="screen-ranking" class="screen">
+            <h1>🏆 명예의 전당</h1>
+            <ul id="ranking-list">
+                <!-- 자바스크립트로 랭킹 리스트가 렌더링될 자리 -->
+            </ul>
+            <button id="btn-back-to-start">처음으로 돌아가기</button>
         </div>
 
         <!-- 일시정지 화면 -->
@@ -54,7 +70,7 @@
         </div>
     </div>
 
-    <!-- JS 메인 파일 연결 (반드시 module 타입 사용) -->
+    <!-- JS 메인 파일 연결 -->
     <script type="module" src="./js/main.js"></script>
 </body>
 </html>

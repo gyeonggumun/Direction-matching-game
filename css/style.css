@@ -141,3 +141,46 @@ body.reduced-motion .shake {
     align-items: center;
     z-index: 100;
 }
+
+/* 랭킹 시스템 스타일 추가 */
+#input-name {
+    padding: 12px;
+    font-size: 1.1rem;
+    border: 2px solid #cbd5e1;
+    border-radius: 8px;
+    width: 200px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+}
+#input-name:focus {
+    border-color: var(--primary-color);
+}
+
+#ranking-list {
+    list-style: none;
+    padding: 0;
+    width: 80%;
+    max-height: 300px;
+    overflow-y: auto;
+    margin: 20px 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.ranking-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 1.1rem;
+    background: #f8fafc;
+}
+.ranking-item:last-child {
+    border-bottom: none;
+}
+.ranking-item.top-rank {
+    background: #fffbeb;
+    font-weight: bold;
+    color: #d97706;
+}
