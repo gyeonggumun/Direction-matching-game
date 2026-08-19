@@ -1,4 +1,3 @@
-// js/audio.js
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 export function playSound(type, isMuted) {
