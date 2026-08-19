@@ -7,6 +7,7 @@ export const screens = {
 
 export const els = {
     gameContainer: document.getElementById('game-container'),
+    introOverlay: document.getElementById('intro-overlay'), // 💡 새로 추가된 요소
     promptArrow: document.getElementById('prompt-arrow'),
     score: document.getElementById('ui-score'),
     mistakes: document.getElementById('ui-mistakes'),

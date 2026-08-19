@@ -20,6 +20,17 @@ let pauseIntervalId;
 let pauseStartTime;
 
 function init() {
+    if (els.introOverlay) {
+        els.gameContainer.classList.add('blurred');
+        els.introOverlay.addEventListener('click', () => {
+            els.introOverlay.style.display = 'none';
+            els.gameContainer.classList.remove('blurred');
+        });
+    }
+
+    els.bestScore.innerText = loadBestScore();
+    
+    els.btnStartEasy.addEventListener('click', () => startGame('easy'));
     els.bestScore.innerText = loadBestScore();
     
     els.btnStartEasy.addEventListener('click', () => startGame('easy'));
