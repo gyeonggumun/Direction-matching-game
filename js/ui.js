@@ -18,12 +18,12 @@ export const els = {
     muteToggle: document.getElementById('mute-toggle'),
     motionToggle: document.getElementById('motion-toggle'),
     
-    // 👇 버튼 교체됨
     btnStartEasy: document.getElementById('btn-start-easy'),
     btnStartNormal: document.getElementById('btn-start-normal'),
     btnStartHard: document.getElementById('btn-start-hard'),
     
     btnRestart: document.getElementById('btn-restart'),
+    btnBackToDiff: document.getElementById('btn-back-to-diff'), // 💡 새로 추가된 버튼
     btnViewRecords: document.getElementById('btn-view-records'),
     rankingList: document.getElementById('ranking-list'),
     btnBackToStart: document.getElementById('btn-back-to-start'),
@@ -31,7 +31,6 @@ export const els = {
 };
 
 export function triggerAnimation(animClass) {
-    // 애니메이션 적용을 위해 잠시 클래스를 뺐다가 다시 넣기
     els.promptArrow.classList.remove(animClass);
     void els.promptArrow.offsetWidth; 
     els.promptArrow.classList.add(animClass);
@@ -60,7 +59,6 @@ export function renderRecords(records) {
         li.className = 'ranking-item';
         
         const statusText = rec.isSuccess ? '🟢 성공' : '🔴 실패';
-        // 기록 목록에 어떤 난이도로 했는지 표시
         const diffTag = `<span style="font-size: 0.8em; background:#e2e8f0; padding:2px 6px; border-radius:4px; margin-right:8px;">${rec.difficultyName || '-'}</span>`;
         
         li.innerHTML = `

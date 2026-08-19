@@ -7,10 +7,10 @@ let state = {
     status: 'IDLE',
     score: 0,
     mistakes: 0,
-    timeLeft: 30.0, // 기본값
+    timeLeft: 30.0,
     currentKey: '',
     lastFrameTime: 0,
-    currentDifficulty: null // 현재 플레이 중인 난이도 객체 저장
+    currentDifficulty: null 
 };
 
 let animationFrameId;
@@ -18,13 +18,17 @@ let animationFrameId;
 function init() {
     els.bestScore.innerText = loadBestScore();
     
-    // 난이도별 시작 버튼 이벤트
     els.btnStartEasy.addEventListener('click', () => startGame('easy'));
     els.btnStartNormal.addEventListener('click', () => startGame('normal'));
     els.btnStartHard.addEventListener('click', () => startGame('hard'));
     
-    // 다시 시작 시 마지막에 선택했던 난이도로 재시작
     els.btnRestart.addEventListener('click', () => startGame(state.currentDifficulty.id));
+    
+    // 💡 새로 추가된 버튼: 클릭 시 난이도 선택(시작) 화면으로 이동
+    els.btnBackToDiff.addEventListener('click', () => {
+        els.bestScore.innerText = loadBestScore();
+        switchScreen('start');
+    });
     
     els.pauseOverlay.addEventListener('click', resumeGame);
     
@@ -62,7 +66,7 @@ function startGame(levelId) {
     state.status = 'PLAYING';
     state.score = 0;
     state.mistakes = 0;
-    state.timeLeft = state.currentDifficulty.timeLimit; // 난이도별 시간 할당
+    state.timeLeft = state.currentDifficulty.timeLimit; 
     state.lastFrameTime = performance.now();
 
     updateHUD(state.score, state.mistakes);
@@ -99,8 +103,7 @@ function setNextArrow() {
     state.currentKey = ARROW_KEYS[randomIndex];
     els.promptArrow.innerText = ARROWS[state.currentKey];
     
-    // ✨ 난이도 규칙에 따른 색상 적용
-    els.promptArrow.className = ''; // 기존 애니메이션 및 색상 클래스 리셋
+    els.promptArrow.className = ''; 
     
     if (state.currentDifficulty.useColor) {
         if (state.currentKey === 'ArrowUp') els.promptArrow.classList.add('color-up');
@@ -108,7 +111,7 @@ function setNextArrow() {
         if (state.currentKey === 'ArrowLeft') els.promptArrow.classList.add('color-left');
         if (state.currentKey === 'ArrowRight') els.promptArrow.classList.add('color-right');
     } else {
-        els.promptArrow.classList.add('color-none'); // 어려움 모드는 검정색 고정
+        els.promptArrow.classList.add('color-none'); 
     }
     
     void els.promptArrow.offsetWidth; 
@@ -178,7 +181,6 @@ function endGame(isSuccess, message) {
 
     const timeTaken = (state.currentDifficulty.timeLimit - state.timeLeft).toFixed(1);
     
-    // 💡 저장할 때 난이도 이름(쉬움, 보통, 어려움)도 함께 넘김
     saveRecord(state.score, timeTaken, isSuccess, state.currentDifficulty.name);
 
     els.resultTitle.innerText = isSuccess ? '🎯 성공!' : '💀 실패!';

@@ -19,7 +19,7 @@
             </div>
         </header>
 
-        <!-- 1. 시작 화면 (수정됨: 난이도 버튼 3개 추가) -->
+        <!-- 1. 시작 화면 -->
         <div id="screen-start" class="screen active">
             <h1>방향 매칭 게임</h1>
             <p>화면에 나타나는 화살표 방향과 똑같은 <b>키보드 방향키(↑, ↓, ←, →)</b>를 누르세요.<br>
@@ -44,13 +44,16 @@
             </div>
         </div>
 
-        <!-- 3. 결과 화면 -->
+        <!-- 3. 결과 화면 (수정됨: 홈으로 가기 버튼 추가) -->
         <div id="screen-gameover" class="screen">
             <h1 id="result-title">게임 오버</h1>
             <p id="result-desc"></p>
             
-            <button id="btn-view-records" style="background-color: #10b981; margin-top: 20px;">📊 내 20회 기록 보기</button>
-            <button id="btn-restart" style="background-color: #64748b; margin-top: 10px;">다시 시작 (방금 난이도)</button>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px; width: 250px;">
+                <button id="btn-view-records" style="background-color: #10b981; margin: 0;">📊 내 20회 기록 보기</button>
+                <button id="btn-restart" style="background-color: #64748b; margin: 0;">다시 시작 (방금 난이도)</button>
+                <button id="btn-back-to-diff" style="background-color: #3b82f6; margin: 0;">🏠 난이도 선택으로 가기</button>
+            </div>
         </div>
 
         <!-- 4. 기록 화면 -->
